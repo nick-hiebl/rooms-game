@@ -1,0 +1,24 @@
+{
+  "name": "rooms-game",
+  "version": "1.0.0",
+  "main": "src/App.ts",
+  "devDependencies": {
+    "esbuild": "^0.19.5",
+    "nodemon": "^3.0.1",
+    "prettier": "^3.1.0",
+    "typescript": "^5.2.2"
+  },
+  "scripts": {
+    "build": "esbuild src/App.ts --bundle --minify --sourcemap --outfile=build/index.js",
+    "serve": "http-server -c-1",
+    "typecheck": "tsc",
+    "watch": "nodemon --exec \"yarn build && yarn serve\" -e js,ts --ignore build/",
+    "lint:fix": "prettier --write \"src/**/*.{js,ts}\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nick-hiebl/rooms-game"
+  },
+  "author": "nick-hiebl",
+  "license": "MIT"
+}
