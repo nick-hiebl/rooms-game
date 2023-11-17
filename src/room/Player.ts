@@ -33,7 +33,7 @@ export class Player {
   }
 
   onInput(input: InputEvent, room: Room) {
-    if (input.isForKey(Input.Interact)) {
+    if (input.isForKey(Input.Interact) || input.isClick()) {
       const cursorCell = this.getCursorCell();
       if (cursorCell) {
         room.interactOnCell(cursorCell);
