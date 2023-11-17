@@ -2,13 +2,13 @@ import { Direction, ExitEvent } from "../game-modes/GameEvent";
 import { Vector } from "../math/Vector";
 import { Room } from "./Room";
 
-const parseKey = (s: string): Vector => {
+export const parseKey = (s: string): Vector => {
   const [x, y] = s.split(",").map(x => parseInt(x));
 
   return new Vector(x, y);
 };
 
-const encodeKey = (v: Vector): string => {
+export const encodeKey = (v: Vector): string => {
   return `${v.x},${v.y}`;
 };
 
@@ -24,8 +24,11 @@ export class RoomWeb {
 
   map: Map<string, Room>;
 
+  rooms: Room[];
+
   constructor() {
     this.map = new Map();
+    this.rooms = [];
     
     this.currentRoom = this.createRoom(new Vector(0, 0));
   }
@@ -33,8 +36,13 @@ export class RoomWeb {
   createRoom(position: Vector) {
     const newRoom = new Room(encodeKey(position), 900, 600);
     this.map.set(encodeKey(position), newRoom);
+    this.rooms.push(newRoom);
 
     return newRoom;
+  }
+
+  currentRoomPosition() {
+    return parseKey(this.currentRoom.key);
   }
 
   navigate(event: ExitEvent) {

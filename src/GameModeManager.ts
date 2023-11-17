@@ -1,5 +1,6 @@
 import { Input } from "./constants/Keys";
 import { IS_MOBILE } from "./constants/ScreenConstants";
+import { MapMode } from "./game-modes/MapMode";
 // import { MapMode } from "./game-modes/MapMode";
 import { PlayMode } from "./game-modes/PlayMode";
 import { InputEvent, InputState } from "./InputManager";
@@ -22,13 +23,13 @@ const ALL_SECTIONS = [
 
 export class GameModeManager {
   playMode: PlayMode;
-  // mapMode: MapMode;
+  mapMode: MapMode;
 
   currentMode: Mode;
 
   constructor() {
     this.playMode = new PlayMode(this);
-    // this.mapMode = new MapMode(this);
+    this.mapMode = new MapMode(this);
 
     // Probably needs to initially be a menu mode eventually, or some dev-mode tooling
     this.currentMode = this.playMode;
@@ -55,17 +56,17 @@ export class GameModeManager {
    */
   onInput(input: InputEvent) {
     let consumed = false;
-    // if (this.currentMode === this.playMode) {
-    //   if (input.isForKey(Input.Map)) {
-    //     consumed = true;
-    //     this.switchToMode(this.mapMode);
-    //   }
-    // } else if (this.currentMode === this.mapMode) {
-    //   if (input.isForKey(Input.Escape) || input.isForKey(Input.Map)) {
-    //     consumed = false;
-    //     this.switchToMode(this.playMode);
-    //   }
-    // }
+    if (this.currentMode === this.playMode) {
+      if (input.isForKey(Input.Map)) {
+        consumed = true;
+        this.switchToMode(this.mapMode);
+      }
+    } else if (this.currentMode === this.mapMode) {
+      if (input.isForKey(Input.Escape) || input.isForKey(Input.Map)) {
+        consumed = false;
+        this.switchToMode(this.playMode);
+      }
+    }
 
     if (!consumed) {
       this.currentMode.onInput(input);

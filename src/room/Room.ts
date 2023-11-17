@@ -13,6 +13,8 @@ const DOORWAY_SIZE = GRID_SIZE * 2;
 
 const BOUNDARY = 50;
 
+const randint = (max: number) => Math.floor(Math.random() * max);
+
 export class Room {
   key: string;
   width: number;
@@ -28,7 +30,11 @@ export class Room {
   blocks: Rectangle[];
   exits: [Rectangle, Direction][];
 
+  color: string;
+
   constructor(key: string, width: number, height: number) {
+    this.color = `hsl(${randint(360)}, ${randint(20) + 50}%, ${randint(30) + 60}%)`;
+
     this.key = key;
     this.width = floorTo(width, 2 * GRID_SIZE);
     this.height = floorTo(height, 2 * GRID_SIZE);
@@ -125,6 +131,8 @@ export class Room {
   draw(screenManager: ScreenManager) {
     screenManager.setCamera(this.camera.copy().add(new Vector(BOUNDARY, BOUNDARY)));
 
+    screenManager.uiCanvas.clear();
+
     if (this.backgroundDirty) {
       this.backgroundDirty = false;
 
@@ -137,7 +145,7 @@ export class Room {
       canvas.setLineWidth(5);
       canvas.strokeRect(0, 0, this.width, this.height);
 
-      canvas.setColor("white");
+      canvas.setColor(this.color);
       canvas.fillRect(0, 0, this.width, this.height);
 
       canvas.setColor("gray");
@@ -154,6 +162,29 @@ export class Room {
     this.player.draw(canvas);
 
     canvas.translate(-BOUNDARY, -BOUNDARY);
+  }
+
+  drawForMap(canvas: Canvas) {
+    const INSET = 4;
+
+    const insetRect = (insetBy: number) =>
+      canvas.fillRect(
+        insetBy * INSET,
+        insetBy * INSET,
+        canvas.width - insetBy * INSET * 2,
+        canvas.height - insetBy * INSET * 2,
+      );
+
+    canvas.setColor("grey");
+    insetRect(1);
+
+    canvas.setColor(this.color);
+    insetRect(2);
+
+    // canvas.scale(1/GRID_SIZE, 1/GRID_SIZE);
+    // canvas.setColor("grey");
+    // this.blocks.forEach(block => block.draw(canvas));
+    // canvas.scale(GRID_SIZE, GRID_SIZE);
   }
 
   enterFrom(event: ExitEvent) {

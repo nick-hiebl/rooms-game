@@ -29,7 +29,7 @@ export class ScreenManager {
   // behindGroundCanvas: Canvas;
   staticWorldCanvas: Canvas;
   dynamicWorldCanvas: Canvas;
-  // uiCanvas: Canvas;
+  uiCanvas: Canvas;
   camera: Vector;
 
   constructor() {
@@ -55,17 +55,17 @@ export class ScreenManager {
       CANVAS_WIDTH * 3,
       CANVAS_HEIGHT * 4
     );
-    // this.uiCanvas = Canvas.fromScratch(
-    //   ON_SCREEN_CANVAS_WIDTH,
-    //   ON_SCREEN_CANVAS_HEIGHT
-    // );
+    this.uiCanvas = Canvas.fromScratch(
+      ON_SCREEN_CANVAS_WIDTH,
+      ON_SCREEN_CANVAS_HEIGHT
+    );
 
     // Stores the top-left position of the camera
     this.camera = new Vector(0, 0);
   }
 
   setCamera(cameraPosition: Vector) {
-    this.camera = cameraPosition;
+    this.camera = Vector.diff(cameraPosition, new Vector(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2));
   }
 
   drawCanvas(
@@ -76,8 +76,8 @@ export class ScreenManager {
   ) {
     this[REAL_CANVAS].drawImage(
       canvas,
-      camera.x - width / 2,
-      camera.y - height / 2,
+      camera.x,
+      camera.y,
       width,
       height,
       0,
@@ -93,12 +93,12 @@ export class ScreenManager {
     // this.drawCanvas(this.behindGroundCanvas, this.camera);
     this.drawCanvas(this.staticWorldCanvas, this.camera);
     this.drawCanvas(this.dynamicWorldCanvas, this.camera);
-    // this.drawCanvas(
-    //   this.uiCanvas,
-    //   new Vector(0, 0),
-    //   CANVAS_WIDTH,
-    //   CANVAS_HEIGHT,
-    // );
+    this.drawCanvas(
+      this.uiCanvas,
+      new Vector(0, 0),
+      CANVAS_WIDTH,
+      CANVAS_HEIGHT,
+    );
   }
 
   static instance = null;
