@@ -27,7 +27,7 @@ export class ScreenManager {
   [REAL_CANVAS]: Canvas;
   // background: Canvas;
   // behindGroundCanvas: Canvas;
-  // staticWorldCanvas: Canvas;
+  staticWorldCanvas: Canvas;
   dynamicWorldCanvas: Canvas;
   // uiCanvas: Canvas;
   camera: Vector;
@@ -47,10 +47,10 @@ export class ScreenManager {
     //   CANVAS_WIDTH * 3,
     //   CANVAS_HEIGHT * 4
     // );
-    // this.staticWorldCanvas = Canvas.fromScratch(
-    //   CANVAS_WIDTH * 3,
-    //   CANVAS_HEIGHT * 4
-    // );
+    this.staticWorldCanvas = Canvas.fromScratch(
+      CANVAS_WIDTH * 3,
+      CANVAS_HEIGHT * 4
+    );
     this.dynamicWorldCanvas = Canvas.fromScratch(
       CANVAS_WIDTH * 3,
       CANVAS_HEIGHT * 4
@@ -91,7 +91,7 @@ export class ScreenManager {
     this[REAL_CANVAS].clear();
     // this.drawCanvas(this.background, this.camera);
     // this.drawCanvas(this.behindGroundCanvas, this.camera);
-    // this.drawCanvas(this.staticWorldCanvas, this.camera);
+    this.drawCanvas(this.staticWorldCanvas, this.camera);
     this.drawCanvas(this.dynamicWorldCanvas, this.camera);
     // this.drawCanvas(
     //   this.uiCanvas,

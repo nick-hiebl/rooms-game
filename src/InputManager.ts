@@ -7,16 +7,13 @@ import { Vector } from "./math/Vector";
 
 const KEY_MAP: Record<string, Key> = {
   " ": Input.Jump,
-  escape: Input.Escape,
-  esc: Input.Escape,
   Escape: Input.Escape,
-  Esc: Input.Escape,
-  w: Input.Up,
-  a: Input.Left,
-  s: Input.Down,
-  d: Input.Right,
-  e: Input.Interact,
-  m: Input.Map,
+  KeyW: Input.Up,
+  KeyA: Input.Left,
+  KeyS: Input.Down,
+  KeyD: Input.Right,
+  KeyE: Input.Interact,
+  KeyM: Input.Map,
 };
 
 type ValueOf<T> = T[keyof T];
@@ -176,7 +173,7 @@ export class InputManager {
     };
 
     document.addEventListener("keydown", (e) => {
-      const key = e.key.toLowerCase();
+      const key = e.code;
 
       if (e.repeat) {
         return;
@@ -192,7 +189,7 @@ export class InputManager {
     });
 
     document.addEventListener("keyup", (e) => {
-      const key = e.key.toLowerCase();
+      const key = e.code;
 
       const symbol = KEY_MAP[key];
       if (!symbol) {

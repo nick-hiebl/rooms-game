@@ -23,13 +23,14 @@ export class Room {
 
   visited = false;
 
+  backgroundDirty = true;
+
   constructor(key: string, width: number, height: number) {
     this.key = key;
     this.width = width;
     this.height = height;
 
     this.camera = new Vector(this.width / 2, this.height / 2);
-    // this.camera = new Vector(0, 0);
     this.player = new Player(this.camera.copy());
 
     this.blocks = [];
@@ -82,32 +83,45 @@ export class Room {
       const overlap = this.player.collider.intersectsBy(newRect);
 
       if (overlap < 5) {
+        this.backgroundDirty = true;
         this.blocks.push(newRect);
       } else {
         // Do nothing
       }
     } else {
+      this.backgroundDirty = true;
       this.blocks.splice(removedIndex, 1);
     }
   }
 
   draw(screenManager: ScreenManager) {
-    screenManager.setCamera(this.camera.copy().add(new Vector(BOUNDARY / 2, BOUNDARY / 2)));
+    screenManager.setCamera(this.camera.copy().add(new Vector(BOUNDARY, BOUNDARY)));
+
+    if (this.backgroundDirty) {
+      this.backgroundDirty = false;
+
+      const canvas = screenManager.staticWorldCanvas;
+      canvas.clear();
+
+      canvas.translate(BOUNDARY, BOUNDARY);
+
+      canvas.setColor("black");
+      canvas.setLineWidth(5);
+      canvas.strokeRect(0, 0, this.width, this.height);
+
+      canvas.setColor("white");
+      canvas.fillRect(0, 0, this.width, this.height);
+
+      canvas.setColor("gray");
+      this.blocks.forEach((block) => block.draw(canvas));
+
+      canvas.translate(-BOUNDARY, -BOUNDARY);
+    }
     
     const canvas = screenManager.dynamicWorldCanvas;
     canvas.clear();
 
     canvas.translate(BOUNDARY, BOUNDARY);
-
-    canvas.setColor("black");
-    canvas.setLineWidth(5);
-    canvas.strokeRect(0, 0, this.width, this.height);
-
-    canvas.setColor("white");
-    canvas.fillRect(0, 0, this.width, this.height);
-
-    canvas.setColor("gray");
-    this.blocks.forEach((block) => block.draw(canvas));
 
     this.player.draw(canvas);
 
