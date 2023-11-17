@@ -1,11 +1,12 @@
 import { Canvas } from "../Canvas";
+import { GRID_SIZE } from "../constants/WorldConstants";
 import { InputEvent, InputState } from "../InputManager";
 import { Rectangle } from "../math/Shapes";
 import { Vector } from "../math/Vector";
 import { ScreenManager } from "../ScreenManager";
 import { Player } from "./Player";
 
-const DOORWAY_SIZE = 100;
+const DOORWAY_SIZE = GRID_SIZE * 2;
 
 const BOUNDARY = 50;
 
@@ -32,10 +33,10 @@ export class Room {
     this.player = new Player(this.camera.copy());
 
     this.blocks = [];
-    for (let i = 0; i < this.width; i += 50) {
-      for (let j = 0; j < this.height; j += 50) {
+    for (let i = 0; i < this.width; i += GRID_SIZE) {
+      for (let j = 0; j < this.height; j += GRID_SIZE) {
         if (Math.random() < 0.2) {
-          this.blocks.push(new Rectangle(i, j, i + 50, j + 50));
+          this.blocks.push(new Rectangle(i, j, i + GRID_SIZE, j + GRID_SIZE));
         }
       }
     }
@@ -70,14 +71,14 @@ export class Room {
     let removedIndex = -1;
     for (let index = 0; index < this.blocks.length; index++) {
       const block = this.blocks[index];
-      if (block.x1 === position.x && block.y1 === position.y && block.width === 50 && block.height === 50) {
+      if (block.x1 === position.x && block.y1 === position.y && block.width === GRID_SIZE && block.height === GRID_SIZE) {
         removedIndex = index;
         break;
       }
     }
 
     if (removedIndex === -1) {
-      const newRect = Rectangle.widthForm(position.x, position.y, 50, 50);
+      const newRect = Rectangle.widthForm(position.x, position.y, GRID_SIZE, GRID_SIZE);
       const overlap = this.player.collider.intersectsBy(newRect);
 
       if (overlap < 5) {

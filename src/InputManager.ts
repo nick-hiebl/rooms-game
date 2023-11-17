@@ -176,23 +176,29 @@ export class InputManager {
     };
 
     document.addEventListener("keydown", (e) => {
+      const key = e.key.toLowerCase();
+
       if (e.repeat) {
         return;
       }
-      const symbol = KEY_MAP[e.key];
+      const symbol = KEY_MAP[key];
       if (!symbol) {
         return;
       }
+
 
       this.isButtonDown[symbol] = true;
       onKeyEvent(symbol);
     });
 
     document.addEventListener("keyup", (e) => {
-      const symbol = KEY_MAP[e.key];
+      const key = e.key.toLowerCase();
+
+      const symbol = KEY_MAP[key];
       if (!symbol) {
         return;
       }
+
 
       this.isButtonDown[symbol] = false;
     });
