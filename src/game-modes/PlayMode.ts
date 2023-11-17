@@ -4,9 +4,8 @@ import { Room } from "../room/Room";
 import { InputEvent, InputState } from "../InputManager";
 import { ScreenManager } from "../ScreenManager";
 import { GameModeManager } from "../GameModeManager";
-import { Vector } from "../math/Vector";
 import { GRID_SIZE } from "../constants/WorldConstants";
-import { roundTo } from "../math/Common";
+import { floorTo } from "../math/Common";
 
 export class PlayMode {
   gameModeManager: GameModeManager;
@@ -18,7 +17,7 @@ export class PlayMode {
     this.gameModeManager = gameModeManager;
     // this.levelManager = new LevelManager();
 
-    this.currentRoom = new Room("abc", roundTo(900, 2 * GRID_SIZE), roundTo(600, 2 * GRID_SIZE));
+    this.currentRoom = new Room("abc", floorTo(900, 2 * GRID_SIZE), floorTo(600, 2 * GRID_SIZE));
     this.startLevel(this.currentRoom);
   }
 

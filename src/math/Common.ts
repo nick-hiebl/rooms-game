@@ -18,6 +18,6 @@ export const sign = (x: number): number => {
   }
 };
 
-export const roundTo = (x: number, fidelity: number): number => {
+export const floorTo = (x: number, fidelity: number): number => {
   return fidelity * Math.floor(x / fidelity);
 };

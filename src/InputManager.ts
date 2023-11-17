@@ -301,8 +301,9 @@ export class InputManager {
       : event;
     return Vector.scale(
       new Vector(
-        e.clientX - this.canvas.offsetLeft + window.scrollX,
-        e.clientY - this.canvas.offsetTop + window.scrollY
+        // Subtract half client width and height to have 0, 0 be in the center of the screen
+        e.clientX - this.canvas.offsetLeft + window.scrollX - this.canvas.clientWidth / 2,
+        e.clientY - this.canvas.offsetTop + window.scrollY - this.canvas.clientHeight / 2
       ),
       ((this.canvas.width / this.canvas.clientWidth) * ON_SCREEN_CANVAS_WIDTH) /
         ON_SCREEN_CANVAS_WIDTH
