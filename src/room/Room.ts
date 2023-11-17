@@ -1,6 +1,9 @@
 import { Canvas } from "../Canvas";
 import { GRID_SIZE } from "../constants/WorldConstants";
+import { Direction, ExitEvent } from "../game-modes/GameEvent";
+import { PlayMode } from "../game-modes/PlayMode";
 import { InputEvent, InputState } from "../InputManager";
+import { floorTo } from "../math/Common";
 import { Rectangle } from "../math/Shapes";
 import { Vector } from "../math/Vector";
 import { ScreenManager } from "../ScreenManager";
@@ -14,21 +17,23 @@ export class Room {
   key: string;
   width: number;
   height: number;
+  collider: Rectangle;
 
   player: Player;
-
   camera: Vector;
 
-  blocks: Rectangle[];
-
   visited = false;
-
   backgroundDirty = true;
+
+  blocks: Rectangle[];
+  exits: [Rectangle, Direction][];
 
   constructor(key: string, width: number, height: number) {
     this.key = key;
-    this.width = width;
-    this.height = height;
+    this.width = floorTo(width, 2 * GRID_SIZE);
+    this.height = floorTo(height, 2 * GRID_SIZE);
+
+    this.collider = Rectangle.widthForm(0, 0, width, height);
 
     this.camera = new Vector(this.width / 2, this.height / 2);
     this.player = new Player(this.camera.copy());
@@ -36,7 +41,7 @@ export class Room {
     this.blocks = [];
     for (let i = 0; i < this.width; i += GRID_SIZE) {
       for (let j = 0; j < this.height; j += GRID_SIZE) {
-        if (Math.random() < 0.2) {
+        if (Math.random() < 0.06) {
           this.blocks.push(new Rectangle(i, j, i + GRID_SIZE, j + GRID_SIZE));
         }
       }
@@ -52,15 +57,29 @@ export class Room {
       new Rectangle(-BOUNDARY, this.height / 2 + DOORWAY_SIZE, 0, this.height + BOUNDARY),
       new Rectangle(-BOUNDARY, -BOUNDARY, 0, this.height / 2 - DOORWAY_SIZE),
     ]);
+
+    this.exits = [
+      [Rectangle.widthForm(this.width / 2 - DOORWAY_SIZE, -BOUNDARY, DOORWAY_SIZE * 2, BOUNDARY), 'up'],
+      [Rectangle.widthForm(-BOUNDARY, this.height / 2 - DOORWAY_SIZE, BOUNDARY, DOORWAY_SIZE * 2), 'left'],
+      [Rectangle.widthForm(this.width / 2 - DOORWAY_SIZE, this.height, DOORWAY_SIZE * 2, BOUNDARY), 'down'],
+      [Rectangle.widthForm(this.width, this.height / 2 - DOORWAY_SIZE, BOUNDARY, DOORWAY_SIZE * 2), 'right'],
+    ];
   }
 
   start() {
     this.visited = true;
+    this.backgroundDirty = true;
   }
 
-  update(deltaTime: number, inputState: InputState) {
+  update(deltaTime: number, inputState: InputState, mode: PlayMode) {
     // ...
     this.player.update(deltaTime, inputState, this);
+
+    const exit = this.exits.find(([exit]) => exit.intersectsPoint(this.player.collider.center));
+
+    if (exit) {
+      mode.onLevelEvent(new ExitEvent(this.key, exit[1]));
+    }
   }
 
   onInput(input: InputEvent) {
@@ -80,6 +99,11 @@ export class Room {
 
     if (removedIndex === -1) {
       const newRect = Rectangle.widthForm(position.x, position.y, GRID_SIZE, GRID_SIZE);
+
+      if (!this.collider.intersectsPoint(newRect.midpoint)) {
+        return;
+      }
+
       const overlap = this.player.collider.intersectsBy(newRect);
 
       if (overlap < 5) {
@@ -126,5 +150,19 @@ export class Room {
     this.player.draw(canvas);
 
     canvas.translate(-BOUNDARY, -BOUNDARY);
+  }
+
+  enterFrom(event: ExitEvent) {
+    const BUFF = 10;
+    const map = {
+      up: new Vector(this.width / 2, this.height - BUFF),
+      right: new Vector(BUFF, this.height / 2),
+      down: new Vector(this.width / 2, BUFF),
+      left: new Vector(this.width - BUFF, this.height / 2),
+    }
+
+    this.player.collider.center = map[event.direction];
+
+    this.start();
   }
 }

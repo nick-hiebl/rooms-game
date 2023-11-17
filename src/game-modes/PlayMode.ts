@@ -6,38 +6,37 @@ import { ScreenManager } from "../ScreenManager";
 import { GameModeManager } from "../GameModeManager";
 import { GRID_SIZE } from "../constants/WorldConstants";
 import { floorTo } from "../math/Common";
+import { RoomWeb } from "../room/RoomWeb";
+import { ExitEvent, GameEvent } from "./GameEvent";
 
 export class PlayMode {
   gameModeManager: GameModeManager;
-  // levelManager: LevelManager;
 
-  currentRoom: Room;
+  roomWeb: RoomWeb;
 
   constructor(gameModeManager: GameModeManager) {
     this.gameModeManager = gameModeManager;
-    // this.levelManager = new LevelManager();
 
-    this.currentRoom = new Room("abc", floorTo(900, 2 * GRID_SIZE), floorTo(600, 2 * GRID_SIZE));
-    this.startLevel(this.currentRoom);
+    this.roomWeb = new RoomWeb();
+    this.startLevel(this.roomWeb.currentRoom);
   }
 
   startLevel(room: Room) {
-    this.currentRoom = room;
     room.start(/* this */);
   }
 
   onStart() {
-    this.currentRoom.start();
+    this.roomWeb.currentRoom.start();
   }
 
-  // onLevelEvent(event: LevelEvent) {
-  //   if (event.isExitEvent()) {
-  //     const exitTrigger = (event as ExitEvent).exitTrigger;
-  //     this.startLevel(this.levelManager.getLevel(exitTrigger.key, exitTrigger));
-  //   } else if (event.isOpenMapEvent()) {
-  //     // this.gameModeManager.switchToMode(this.gameModeManager.mapMode);
-  //   }
-  // }
+  onLevelEvent(event: GameEvent) {
+    if (event.isExitEvent()) {
+      const exit = (event as ExitEvent);
+      this.roomWeb.navigate(exit);
+    } else if (event.isOpenMapEvent()) {
+      // this.gameModeManager.switchToMode(this.gameModeManager.mapMode);
+    }
+  }
 
   /**
    * Update.
@@ -45,7 +44,7 @@ export class PlayMode {
    * @param {object} inputState The current state of inputs.
    */
   update(deltaTime: number, inputState: InputState) {
-    this.currentRoom?.update(deltaTime, inputState);
+    this.roomWeb.currentRoom.update(deltaTime, inputState, this);
   }
 
   /**
@@ -53,7 +52,7 @@ export class PlayMode {
    * @param {InputEvent} input The input event to be processed
    */
   onInput(input: InputEvent) {
-    this.currentRoom?.onInput(input);
+    this.roomWeb.currentRoom.onInput(input);
   }
 
   /**
@@ -61,6 +60,6 @@ export class PlayMode {
    * @param {ScreenManager} screenManager The screenManager to draw upon.
    */
   draw(screenManager: ScreenManager) {
-    this.currentRoom?.draw(screenManager);
+    this.roomWeb.currentRoom.draw(screenManager);
   }
 }
