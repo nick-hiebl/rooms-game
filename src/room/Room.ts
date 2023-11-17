@@ -33,14 +33,14 @@ export class Room {
     this.width = floorTo(width, 2 * GRID_SIZE);
     this.height = floorTo(height, 2 * GRID_SIZE);
 
-    this.collider = Rectangle.widthForm(0, 0, width, height);
+    this.collider = Rectangle.widthForm(0, 0, this.width, this.height);
 
     this.camera = new Vector(this.width / 2, this.height / 2);
     this.player = new Player(this.camera.copy());
 
     this.blocks = [];
-    for (let i = 0; i < this.width; i += GRID_SIZE) {
-      for (let j = 0; j < this.height; j += GRID_SIZE) {
+    for (let i = GRID_SIZE; i < this.width - GRID_SIZE; i += GRID_SIZE) {
+      for (let j = GRID_SIZE; j < this.height - GRID_SIZE; j += GRID_SIZE) {
         if (Math.random() < 0.06) {
           this.blocks.push(new Rectangle(i, j, i + GRID_SIZE, j + GRID_SIZE));
         }
@@ -97,10 +97,17 @@ export class Room {
       }
     }
 
-    if (removedIndex === -1) {
+    if (removedIndex !== -1) {
+      this.backgroundDirty = true;
+      this.blocks.splice(removedIndex, 1);
+      return;
+    } else {
       const newRect = Rectangle.widthForm(position.x, position.y, GRID_SIZE, GRID_SIZE);
 
-      if (!this.collider.intersectsPoint(newRect.midpoint)) {
+      if (
+        !this.collider.intersectsPoint(newRect.midpoint) ||
+        this.exits.some(([exit]) => exit.intersectsRectangle(newRect))
+      ) {
         return;
       }
 
@@ -112,9 +119,6 @@ export class Room {
       } else {
         // Do nothing
       }
-    } else {
-      this.backgroundDirty = true;
-      this.blocks.splice(removedIndex, 1);
     }
   }
 
