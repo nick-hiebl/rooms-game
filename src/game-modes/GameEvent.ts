@@ -5,7 +5,7 @@ export interface GameEvent {
   isOpenMapEvent(): boolean;
 }
 
-export type Direction = 'up' | 'left' | 'down' | 'right';
+export type Direction = "up" | "left" | "down" | "right";
 
 export class ExitEvent implements GameEvent {
   fromKey: Vector;

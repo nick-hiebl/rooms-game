@@ -1,8 +1,5 @@
 import { Input } from "./constants/Keys";
-import {
-  ON_SCREEN_CANVAS_WIDTH,
-  IS_MOBILE,
-} from "./constants/ScreenConstants";
+import { ON_SCREEN_CANVAS_WIDTH, IS_MOBILE } from "./constants/ScreenConstants";
 import { Vector } from "./math/Vector";
 
 const KEY_MAP: Record<string, Key> = {
@@ -36,7 +33,7 @@ export class InputState {
     keyMap: KeyMap,
     mousePosition: Vector,
     leftClicking: boolean = false,
-    rightClicking: boolean = false
+    rightClicking: boolean = false,
   ) {
     this.keyMap = keyMap;
     this.mousePosition = mousePosition;
@@ -183,7 +180,6 @@ export class InputManager {
         return;
       }
 
-
       this.isButtonDown[symbol] = true;
       onKeyEvent(symbol);
     });
@@ -196,42 +192,54 @@ export class InputManager {
         return;
       }
 
-
       this.isButtonDown[symbol] = false;
     });
 
-    this.canvas.addEventListener(IS_MOBILE ? "touchmove" : "mousemove", (event) => {
-      this.mousePosition = this.toCanvasPosition(event);
-    });
+    this.canvas.addEventListener(
+      IS_MOBILE ? "touchmove" : "mousemove",
+      (event) => {
+        this.mousePosition = this.toCanvasPosition(event);
+      },
+    );
 
-    this.canvas.addEventListener(IS_MOBILE ? "touchstart" : "mousedown", (event) => {
-      if (IS_MOBILE) {
-        event.preventDefault();
-      }
-      this.mousePosition = this.toCanvasPosition(event);
+    this.canvas.addEventListener(
+      IS_MOBILE ? "touchstart" : "mousedown",
+      (event) => {
+        if (IS_MOBILE) {
+          event.preventDefault();
+        }
+        this.mousePosition = this.toCanvasPosition(event);
 
-      const isLeft = isTouchEvent(event) || (event instanceof MouseEvent && event.button === 0);
-      const isRight = event instanceof MouseEvent && event.button === 2;
+        const isLeft =
+          isTouchEvent(event) ||
+          (event instanceof MouseEvent && event.button === 0);
+        const isRight = event instanceof MouseEvent && event.button === 2;
 
-      if (isLeft) {
-        this.listener?.(new ClickEvent(this.mousePosition, false));
-        this.leftClicking = true;
-      } else if (isRight) {
-        this.listener?.(new ClickEvent(this.mousePosition, true));
-        this.rightClicking = true;
-      }
-    });
+        if (isLeft) {
+          this.listener?.(new ClickEvent(this.mousePosition, false));
+          this.leftClicking = true;
+        } else if (isRight) {
+          this.listener?.(new ClickEvent(this.mousePosition, true));
+          this.rightClicking = true;
+        }
+      },
+    );
 
-    this.canvas.addEventListener(IS_MOBILE ? "touchend" : "mouseup", (event) => {
-      const isLeft = isTouchEvent(event) || (event instanceof MouseEvent && event.button === 0);
-      const isRight = event instanceof MouseEvent && event.button === 2;
+    this.canvas.addEventListener(
+      IS_MOBILE ? "touchend" : "mouseup",
+      (event) => {
+        const isLeft =
+          isTouchEvent(event) ||
+          (event instanceof MouseEvent && event.button === 0);
+        const isRight = event instanceof MouseEvent && event.button === 2;
 
-      if (isLeft) {
-        this.leftClicking = false;
-      } else if (isRight) {
-        this.rightClicking = false;
-      }
-    });
+        if (isLeft) {
+          this.leftClicking = false;
+        } else if (isRight) {
+          this.rightClicking = false;
+        }
+      },
+    );
 
     this.canvas.addEventListener("contextmenu", (event) => {
       event.preventDefault();
@@ -297,16 +305,22 @@ export class InputManager {
 
   toCanvasPosition(event: MouseEvent | TouchEvent) {
     const e = isTouchEvent(event)
-      ? (event.touches.item(0) || { clientX: 0, clientY: 0 })
+      ? event.touches.item(0) || { clientX: 0, clientY: 0 }
       : event;
     return Vector.scale(
       new Vector(
         // Subtract half client width and height to have 0, 0 be in the center of the screen
-        e.clientX - this.canvas.offsetLeft + window.scrollX - this.canvas.clientWidth / 2,
-        e.clientY - this.canvas.offsetTop + window.scrollY - this.canvas.clientHeight / 2
+        e.clientX -
+          this.canvas.offsetLeft +
+          window.scrollX -
+          this.canvas.clientWidth / 2,
+        e.clientY -
+          this.canvas.offsetTop +
+          window.scrollY -
+          this.canvas.clientHeight / 2,
       ),
       ((this.canvas.width / this.canvas.clientWidth) * ON_SCREEN_CANVAS_WIDTH) /
-        ON_SCREEN_CANVAS_WIDTH
+        ON_SCREEN_CANVAS_WIDTH,
     );
   }
 
@@ -318,7 +332,7 @@ export class InputManager {
       this.isButtonDown,
       this.mousePosition,
       this.leftClicking,
-      this.rightClicking
+      this.rightClicking,
     );
   }
 }

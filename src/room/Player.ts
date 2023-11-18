@@ -1,13 +1,18 @@
 import { Canvas } from "../Canvas";
 import { Input } from "../constants/Keys";
-import { GRID_SIZE, PLAYER_CORNER, PLAYER_REACH, PLAYER_SIZE } from "../constants/WorldConstants";
+import {
+  GRID_SIZE,
+  PLAYER_CORNER,
+  PLAYER_REACH,
+  PLAYER_SIZE,
+} from "../constants/WorldConstants";
 import { InputEvent, InputState } from "../InputManager";
 import { floorTo } from "../math/Common";
 import { Octagon } from "../math/Shapes";
 import { Vector } from "../math/Vector";
 import { Room } from "./Room";
 
-const PLAYER_MAX_SPEED = 500 //130;
+const PLAYER_MAX_SPEED = 500; //130;
 const PLAYER_ACCEL = PLAYER_MAX_SPEED / 1.2;
 
 export class Player {
@@ -29,7 +34,10 @@ export class Player {
       return null;
     }
 
-    return new Vector(floorTo(cursor.x, GRID_SIZE), floorTo(cursor.y, GRID_SIZE));
+    return new Vector(
+      floorTo(cursor.x, GRID_SIZE),
+      floorTo(cursor.y, GRID_SIZE),
+    );
   }
 
   onInput(input: InputEvent, room: Room) {
@@ -63,7 +71,7 @@ export class Player {
     const off = this.velocity.copy().multiply(deltaTime);
 
     this.collider.center.add(off);
-    
+
     for (const block of room.blocks) {
       this.collider.collideRectangle(block);
     }
@@ -77,9 +85,7 @@ export class Player {
     }
   }
 
-  collideWithBlock() {
-
-  }
+  collideWithBlock() {}
 
   draw(canvas: Canvas) {
     const cursorCell = this.getCursorCell();

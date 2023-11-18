@@ -31,7 +31,7 @@ export class PlayMode {
 
   onLevelEvent(event: GameEvent) {
     if (event.isExitEvent()) {
-      const exit = (event as ExitEvent);
+      const exit = event as ExitEvent;
       this.roomWeb.navigate(exit);
     } else if (event.isOpenMapEvent()) {
       // this.gameModeManager.switchToMode(this.gameModeManager.mapMode);

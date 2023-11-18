@@ -60,13 +60,13 @@ export class Canvas {
     y: number,
     width: number,
     height: number,
-    inset: number
+    inset: number,
   ) {
     this.strokeRect(
       x + inset,
       y + inset,
       width - inset * 2,
-      height - inset * 2
+      height - inset * 2,
     );
   }
 
@@ -135,7 +135,7 @@ export class Canvas {
     const toPoint = startAngle + Math.PI / 4;
     this[CTX].lineTo(
       x + sign(Math.cos(toPoint)) * radius,
-      y + sign(Math.sin(toPoint)) * radius
+      y + sign(Math.sin(toPoint)) * radius,
     );
     this[CTX].fill();
   }
@@ -169,7 +169,7 @@ export class Canvas {
     x1: number,
     y1: number,
     xControl: number,
-    yControl: number
+    yControl: number,
   ) {
     this[CTX].beginPath();
     this[CTX].moveTo(x0, y0);
@@ -256,7 +256,7 @@ export class Canvas {
     r0: number,
     x1: number,
     y1: number,
-    r1: number
+    r1: number,
   ) {
     return this[CTX].createRadialGradient(x0, y0, r0, x1, y1, r1);
   }
@@ -290,7 +290,7 @@ export class Canvas {
     destinationX: number,
     destinationY: number,
     destinationWidth: number,
-    destinationHeight: number
+    destinationHeight: number,
   ) {
     let image: CanvasImageSource;
     if (imageSource instanceof Canvas) {
@@ -313,7 +313,7 @@ export class Canvas {
       destinationX,
       destinationY,
       destinationWidth,
-      destinationHeight
+      destinationHeight,
     );
   }
 

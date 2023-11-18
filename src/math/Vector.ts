@@ -44,7 +44,7 @@ export class Vector {
       return;
     }
 
-    this.multiply(magnitude / this.magnitude)
+    this.multiply(magnitude / this.magnitude);
   }
 
   static add(a: Vector, b: Vector) {

@@ -1,5 +1,9 @@
 import { Canvas } from "../Canvas";
-import { GRID_SIZE, WORLD_GRID_HEIGHT, WORLD_GRID_WIDTH } from "../constants/WorldConstants";
+import {
+  GRID_SIZE,
+  WORLD_GRID_HEIGHT,
+  WORLD_GRID_WIDTH,
+} from "../constants/WorldConstants";
 import { ExitEvent } from "../game-modes/GameEvent";
 import { PlayMode } from "../game-modes/PlayMode";
 import { InputEvent, InputState } from "../InputManager";
@@ -36,7 +40,9 @@ export class Room {
   color: string;
 
   constructor(position: Vector, width: number, height: number) {
-    this.color = `hsl(${randint(360)}, ${randint(20) + 50}%, ${randint(30) + 60}%)`;
+    this.color = `hsl(${randint(360)}, ${randint(20) + 50}%, ${
+      randint(30) + 60
+    }%)`;
 
     this.key = encodeKey(position);
     this.width = floorTo(width, WORLD_GRID_WIDTH);
@@ -66,23 +72,42 @@ export class Room {
       GW = WORLD_GRID_WIDTH,
       GH = WORLD_GRID_HEIGHT;
 
-      this.exits = [];
+    this.exits = [];
 
     for (let x = 0; x < widthUnits; x++) {
       this.blocks.push(
         // Top
         Rectangle.widthForm(-B + x * GW, -B, GW / 2 - D + B, B),
-        Rectangle.widthForm((x + 1/2) * GW + D, -B, GW / 2 - D + B, B),
+        Rectangle.widthForm((x + 1 / 2) * GW + D, -B, GW / 2 - D + B, B),
         // Bottom
         Rectangle.widthForm(-B + x * GW, heightUnits * GH, GW / 2 - D + B, B),
-        Rectangle.widthForm((x + 1/2) * GW + D, heightUnits * GH, GW / 2 - D + B, B),
+        Rectangle.widthForm(
+          (x + 1 / 2) * GW + D,
+          heightUnits * GH,
+          GW / 2 - D + B,
+          B,
+        ),
       );
 
       this.exits.push(
         // Top
-        [Rectangle.widthForm((x + 1/2) * GW - D, -B, D * 2, B), new ExitEvent(this.position, new Vector(this.position.x + x, this.position.y - 1), 'up')],
+        [
+          Rectangle.widthForm((x + 1 / 2) * GW - D, -B, D * 2, B),
+          new ExitEvent(
+            this.position,
+            new Vector(this.position.x + x, this.position.y - 1),
+            "up",
+          ),
+        ],
         // Bottom
-        [Rectangle.widthForm((x + 1/2) * GW - D, heightUnits * GH, D * 2, B), new ExitEvent(this.position, new Vector(this.position.x + x, this.position.y + heightUnits), 'down')],
+        [
+          Rectangle.widthForm((x + 1 / 2) * GW - D, heightUnits * GH, D * 2, B),
+          new ExitEvent(
+            this.position,
+            new Vector(this.position.x + x, this.position.y + heightUnits),
+            "down",
+          ),
+        ],
       );
     }
 
@@ -90,17 +115,36 @@ export class Room {
       this.blocks.push(
         // Left
         Rectangle.widthForm(-B, -B + y * GH, B, GH / 2 - D + B),
-        Rectangle.widthForm(-B, (y + 1/2) * GH + D, B, GH / 2 - D + B),
+        Rectangle.widthForm(-B, (y + 1 / 2) * GH + D, B, GH / 2 - D + B),
         // Right
         Rectangle.widthForm(widthUnits * GW, -B + y * GH, B, GH / 2 - D + B),
-        Rectangle.widthForm(widthUnits * GW, (y + 1/2) * GH + D, B, GH / 2 - D + B),
+        Rectangle.widthForm(
+          widthUnits * GW,
+          (y + 1 / 2) * GH + D,
+          B,
+          GH / 2 - D + B,
+        ),
       );
 
       this.exits.push(
         // Left
-        [Rectangle.widthForm(-B, (y + 1/2) * GH - D, B, D * 2), new ExitEvent(this.position, new Vector(this.position.x - 1, this.position.y + y), 'left')],
+        [
+          Rectangle.widthForm(-B, (y + 1 / 2) * GH - D, B, D * 2),
+          new ExitEvent(
+            this.position,
+            new Vector(this.position.x - 1, this.position.y + y),
+            "left",
+          ),
+        ],
         // Right
-        [Rectangle.widthForm(widthUnits * GW, (y + 1/2) * GH - D, B, D * 2), new ExitEvent(this.position, new Vector(this.position.x + widthUnits, this.position.y + y), 'right')],
+        [
+          Rectangle.widthForm(widthUnits * GW, (y + 1 / 2) * GH - D, B, D * 2),
+          new ExitEvent(
+            this.position,
+            new Vector(this.position.x + widthUnits, this.position.y + y),
+            "right",
+          ),
+        ],
       );
     }
   }
@@ -114,15 +158,25 @@ export class Room {
     // ...
     this.player.update(deltaTime, inputState, this);
 
-    const exit = this.exits.find(([exit]) => exit.intersectsPoint(this.player.collider.center));
+    const exit = this.exits.find(([exit]) =>
+      exit.intersectsPoint(this.player.collider.center),
+    );
 
     if (exit) {
       mode.onLevelEvent(exit[1]);
     }
 
     this.camera = this.player.collider.center.copy();
-    this.camera.x = clamp(this.camera.x, WORLD_GRID_WIDTH / 2, this.width - WORLD_GRID_WIDTH / 2);
-    this.camera.y = clamp(this.camera.y, WORLD_GRID_HEIGHT / 2, this.height - WORLD_GRID_HEIGHT / 2);
+    this.camera.x = clamp(
+      this.camera.x,
+      WORLD_GRID_WIDTH / 2,
+      this.width - WORLD_GRID_WIDTH / 2,
+    );
+    this.camera.y = clamp(
+      this.camera.y,
+      WORLD_GRID_HEIGHT / 2,
+      this.height - WORLD_GRID_HEIGHT / 2,
+    );
   }
 
   onInput(input: InputEvent) {
@@ -134,7 +188,12 @@ export class Room {
     let removedIndex = -1;
     for (let index = 0; index < this.blocks.length; index++) {
       const block = this.blocks[index];
-      if (block.x1 === position.x && block.y1 === position.y && block.width === GRID_SIZE && block.height === GRID_SIZE) {
+      if (
+        block.x1 === position.x &&
+        block.y1 === position.y &&
+        block.width === GRID_SIZE &&
+        block.height === GRID_SIZE
+      ) {
         removedIndex = index;
         break;
       }
@@ -145,7 +204,12 @@ export class Room {
       this.blocks.splice(removedIndex, 1);
       return;
     } else {
-      const newRect = Rectangle.widthForm(position.x, position.y, GRID_SIZE, GRID_SIZE);
+      const newRect = Rectangle.widthForm(
+        position.x,
+        position.y,
+        GRID_SIZE,
+        GRID_SIZE,
+      );
 
       if (
         !this.collider.intersectsPoint(newRect.midpoint) ||
@@ -166,7 +230,9 @@ export class Room {
   }
 
   draw(screenManager: ScreenManager) {
-    screenManager.setCamera(this.camera.copy().add(new Vector(BOUNDARY, BOUNDARY)));
+    screenManager.setCamera(
+      this.camera.copy().add(new Vector(BOUNDARY, BOUNDARY)),
+    );
 
     screenManager.uiCanvas.clear();
 
@@ -190,7 +256,7 @@ export class Room {
 
       canvas.translate(-BOUNDARY, -BOUNDARY);
     }
-    
+
     const canvas = screenManager.dynamicWorldCanvas;
     canvas.clear();
 
@@ -231,7 +297,10 @@ export class Room {
     const cellInRoom = Vector.diff(event.toKey, this.position);
 
     this.player.collider.center = Vector.add(
-      new Vector(cellInRoom.x * WORLD_GRID_WIDTH, cellInRoom.y * WORLD_GRID_HEIGHT),
+      new Vector(
+        cellInRoom.x * WORLD_GRID_WIDTH,
+        cellInRoom.y * WORLD_GRID_HEIGHT,
+      ),
       map[event.direction],
     );
 

@@ -1,10 +1,13 @@
-import { WORLD_GRID_HEIGHT, WORLD_GRID_WIDTH } from "../constants/WorldConstants";
+import {
+  WORLD_GRID_HEIGHT,
+  WORLD_GRID_WIDTH,
+} from "../constants/WorldConstants";
 import { Direction, ExitEvent } from "../game-modes/GameEvent";
 import { Vector } from "../math/Vector";
 import { Room } from "./Room";
 
 export const parseKey = (s: string): Vector => {
-  const [x, y] = s.split(",").map(x => parseInt(x));
+  const [x, y] = s.split(",").map((x) => parseInt(x));
 
   return new Vector(x, y);
 };
@@ -30,7 +33,7 @@ export class RoomWeb {
   constructor() {
     this.map = new Map();
     this.rooms = [];
-    
+
     this.currentRoom = this.createRoom(new Vector(0, 0));
   }
 
@@ -48,7 +51,11 @@ export class RoomWeb {
       }
     }
 
-    const newRoom = new Room(position, WORLD_GRID_WIDTH * w, WORLD_GRID_HEIGHT * h);
+    const newRoom = new Room(
+      position,
+      WORLD_GRID_WIDTH * w,
+      WORLD_GRID_HEIGHT * h,
+    );
 
     for (const key of keys) {
       this.map.set(key, newRoom);
@@ -66,12 +73,16 @@ export class RoomWeb {
   navigate(event: ExitEvent) {
     const { fromKey, direction, toKey } = event;
 
-    const nextKey = encodeKey(toKey)
+    const nextKey = encodeKey(toKey);
 
     const currentRoom = this.map.get(encodeKey(fromKey));
 
     if (!currentRoom) {
-      console.error("Exited a room that does not exist!", fromKey, Array.from(this.map.keys()));
+      console.error(
+        "Exited a room that does not exist!",
+        fromKey,
+        Array.from(this.map.keys()),
+      );
       return;
     }
 

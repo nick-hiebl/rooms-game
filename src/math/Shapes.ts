@@ -53,7 +53,7 @@ export class Circle {
       this.position.x,
       this.position.y,
       this.radius,
-      this.radius
+      this.radius,
     );
   }
 }
@@ -142,19 +142,19 @@ export class Rectangle {
       if (horizontalDistance < verticalDistance) {
         return new Vector(
           (horizontalDistance + circle.radius) * sign(circleDistToMyCenter.x),
-          0
+          0,
         );
       } else {
         return new Vector(
           0,
-          (verticalDistance + circle.radius) * sign(circleDistToMyCenter.y)
+          (verticalDistance + circle.radius) * sign(circleDistToMyCenter.y),
         );
       }
     }
 
     return Vector.scale(
       pToCenter,
-      (circle.radius - distFromCenter) / distFromCenter
+      (circle.radius - distFromCenter) / distFromCenter,
     );
   }
 
@@ -167,7 +167,7 @@ export class Rectangle {
       this.x1 - outset,
       this.y1 - outset,
       this.width + outset * 2,
-      this.height + outset * 2
+      this.height + outset * 2,
     );
   }
 
@@ -180,7 +180,7 @@ export class Rectangle {
       this.x1 + insetBy,
       this.y1 + insetBy,
       this.x2 - insetBy,
-      this.y2 - insetBy
+      this.y2 - insetBy,
     );
   }
 
@@ -197,7 +197,7 @@ export class Rectangle {
       point.x - halfWidth,
       point.y - halfHeight,
       point.x + halfWidth,
-      point.y + halfHeight
+      point.y + halfHeight,
     );
   }
 
@@ -212,7 +212,7 @@ export class Rectangle {
         Math.max(rect.x2, x2),
         Math.max(rect.y2, y2),
       ],
-      [Infinity, Infinity, -Infinity, -Infinity]
+      [Infinity, Infinity, -Infinity, -Infinity],
     );
 
     return new Rectangle(x1, y1, x2, y2);
@@ -231,21 +231,37 @@ export class Octagon {
   }
 
   draw(canvas: Canvas) {
-    canvas.fillOctagon(this.center.x, this.center.y, this.radius, this.cornerCut);
+    canvas.fillOctagon(
+      this.center.x,
+      this.center.y,
+      this.radius,
+      this.cornerCut,
+    );
   }
 
   intersectsRectangle(rectangle: Rectangle) {
-    const approximate = Rectangle.centerForm(this.center.x, this.center.y, this.radius, this.radius);
-    
+    const approximate = Rectangle.centerForm(
+      this.center.x,
+      this.center.y,
+      this.radius,
+      this.radius,
+    );
+
     if (!approximate.intersectsRectangle(rectangle)) {
       return false;
     }
 
     const rectMid = rectangle.midpoint;
 
-    const centerManhattanDistance = Math.abs(rectMid.x - this.center.x) + Math.abs(rectMid.y - this.center.y);
+    const centerManhattanDistance =
+      Math.abs(rectMid.x - this.center.x) + Math.abs(rectMid.y - this.center.y);
 
-    return centerManhattanDistance < (rectangle.width + rectangle.height) / 2 + this.radius * 2 - this.cornerCut;
+    return (
+      centerManhattanDistance <
+      (rectangle.width + rectangle.height) / 2 +
+        this.radius * 2 -
+        this.cornerCut
+    );
   }
 
   intersectsBy(rectangle: Rectangle) {
@@ -253,10 +269,13 @@ export class Octagon {
     const xDiff = Math.abs(this.center.x - mid.x);
     const yDiff = Math.abs(this.center.y - mid.y);
 
-    return Math.max(0, Math.min(
-      this.radius + rectangle.width / 2 - xDiff,
-      this.radius + rectangle.height / 2 - yDiff,
-    ));
+    return Math.max(
+      0,
+      Math.min(
+        this.radius + rectangle.width / 2 - xDiff,
+        this.radius + rectangle.height / 2 - yDiff,
+      ),
+    );
   }
 
   collideRectangle(rectangle: Rectangle) {
@@ -265,12 +284,18 @@ export class Octagon {
     const xDiff = Math.abs(this.center.x - rectMid.x);
     const yDiff = Math.abs(this.center.y - rectMid.y);
 
-    if (xDiff >= this.radius + rectangle.width / 2 || yDiff >= this.radius + rectangle.height / 2) {
+    if (
+      xDiff >= this.radius + rectangle.width / 2 ||
+      yDiff >= this.radius + rectangle.height / 2
+    ) {
       // Definitely no overlap
       return;
     }
 
-    const manhattanIdeal = (rectangle.width + rectangle.height) / 2 + this.radius * 2 - this.cornerCut;
+    const manhattanIdeal =
+      (rectangle.width + rectangle.height) / 2 +
+      this.radius * 2 -
+      this.cornerCut;
 
     if (xDiff + yDiff >= manhattanIdeal) {
       // In corners, no overlap
@@ -278,7 +303,7 @@ export class Octagon {
     }
 
     if (!this.intersectsRectangle(rectangle)) {
-      console.error('Collision fuck up');
+      console.error("Collision fuck up");
     }
 
     if (yDiff < this.radius - this.cornerCut + rectangle.height / 2) {
@@ -298,7 +323,7 @@ export class Octagon {
     // Diagonal collision
     const manhattanOverlap = manhattanIdeal - (xDiff + yDiff);
 
-    this.center.x += manhattanOverlap / 2 * sign(this.center.x - rectMid.x);
-    this.center.y += manhattanOverlap / 2 * sign(this.center.y - rectMid.y);
+    this.center.x += (manhattanOverlap / 2) * sign(this.center.x - rectMid.x);
+    this.center.y += (manhattanOverlap / 2) * sign(this.center.y - rectMid.y);
   }
 }

@@ -12,7 +12,11 @@ import { Vector } from "../math/Vector";
 import { ScreenManager } from "../ScreenManager";
 import { PlayMode } from "./PlayMode";
 import { parseKey, RoomWeb } from "../room/RoomWeb";
-import { GRID_SIZE, WORLD_GRID_HEIGHT, WORLD_GRID_WIDTH } from "../constants/WorldConstants";
+import {
+  GRID_SIZE,
+  WORLD_GRID_HEIGHT,
+  WORLD_GRID_WIDTH,
+} from "../constants/WorldConstants";
 
 const DEBUG_SHOW_ALL_ROOMS = document.location.toString().includes("localhost");
 
@@ -111,10 +115,11 @@ export class MapMode {
         continue;
       }
 
-      const canvas = this.roomCanvasMap.get(room.key) ||
+      const canvas =
+        this.roomCanvasMap.get(room.key) ||
         Canvas.fromScratch(
-          room.width * 1 / GRID_SIZE * MAP_CANVAS_SCALE,
-          room.height * 1 / GRID_SIZE * MAP_CANVAS_SCALE,
+          ((room.width * 1) / GRID_SIZE) * MAP_CANVAS_SCALE,
+          ((room.height * 1) / GRID_SIZE) * MAP_CANVAS_SCALE,
         );
 
       // canvas.saveTransform();
@@ -129,7 +134,7 @@ export class MapMode {
   toWorldPosition(position: Vector) {
     return Vector.add(
       Vector.scale(position, 1 / this.zoom),
-      this.cameraPosition
+      this.cameraPosition,
     );
   }
 
@@ -156,7 +161,7 @@ export class MapMode {
 
     if (inputState.isLeftClicking() && this.isClicked) {
       this.cameraPosition.subtract(
-        Vector.diff(currentWorldPos, this.mousePosition)
+        Vector.diff(currentWorldPos, this.mousePosition),
       );
     } else {
       this.isClicked = false;
@@ -166,7 +171,9 @@ export class MapMode {
   onInput(inputEvent: InputEvent) {
     // Do nothing
     if (inputEvent.isClick()) {
-      const mousePosition = this.toWorldPosition((inputEvent as ClickEvent).position);
+      const mousePosition = this.toWorldPosition(
+        (inputEvent as ClickEvent).position,
+      );
 
       const room = this.positionToRoomIndex(mousePosition);
 
@@ -197,12 +204,16 @@ export class MapMode {
       const scroll = inputEvent as ScrollEvent;
       if (scroll.discrete) {
         if (scroll.delta > 0) {
-          this.zoom = ZOOM_LEVELS.find(x => x > this.zoom) || MAX_ZOOM;
+          this.zoom = ZOOM_LEVELS.find((x) => x > this.zoom) || MAX_ZOOM;
         } else {
-          this.zoom = ZOOMS_REVERSED.find(x => x < this.zoom) || MIN_ZOOM;
+          this.zoom = ZOOMS_REVERSED.find((x) => x < this.zoom) || MIN_ZOOM;
         }
       } else {
-        this.zoom = clamp(this.zoom + scroll.delta * -ZOOM_SPEED, MIN_ZOOM, MAX_ZOOM);
+        this.zoom = clamp(
+          this.zoom + scroll.delta * -ZOOM_SPEED,
+          MIN_ZOOM,
+          MAX_ZOOM,
+        );
       }
     }
   }
@@ -219,7 +230,10 @@ export class MapMode {
       floorTo(position.y, WORLD_GRID_HEIGHT),
     );
 
-    return new Vector(hoveredRoomPosition.x / WORLD_GRID_WIDTH, hoveredRoomPosition.y / WORLD_GRID_HEIGHT);
+    return new Vector(
+      hoveredRoomPosition.x / WORLD_GRID_WIDTH,
+      hoveredRoomPosition.y / WORLD_GRID_HEIGHT,
+    );
   }
 
   draw(screenManager: ScreenManager) {
@@ -274,11 +288,19 @@ export class MapMode {
 
     canvas.setColor("#fff6");
     canvas.setLineWidth(4);
-    canvas.strokeRect(hoveredRoom.x, hoveredRoom.y, WORLD_GRID_WIDTH, WORLD_GRID_HEIGHT);
+    canvas.strokeRect(
+      hoveredRoom.x,
+      hoveredRoom.y,
+      WORLD_GRID_WIDTH,
+      WORLD_GRID_HEIGHT,
+    );
 
     if (currentPlayer) {
       const worldPosition = this.getRoomPosition(currentRoom);
-      const offset = Vector.add(worldPosition, new Vector(currentRoom.width / 2, currentRoom.height / 2));
+      const offset = Vector.add(
+        worldPosition,
+        new Vector(currentRoom.width / 2, currentRoom.height / 2),
+      );
       canvas.translate(offset.x, offset.y);
 
       canvas.setLineWidth(8);

@@ -10,7 +10,7 @@ export const CANVAS_HEIGHT = 720;
 
 export const IS_MOBILE =
   /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent
+    navigator.userAgent,
   );
 
 export const ON_SCREEN_CANVAS_WIDTH = 1280;
