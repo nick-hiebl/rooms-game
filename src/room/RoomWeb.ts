@@ -34,10 +34,45 @@ export class RoomWeb {
     this.map = new Map();
     this.rooms = [];
 
-    this.currentRoom = this.createRoom(new Vector(0, 0));
+    this.currentRoom = this.createRoomWithoutCheckingNeighbors(
+      new Vector(0, 0),
+    );
   }
 
-  createRoom(position: Vector, w: number = 1, h: number = 1) {
+  createRoom(position: Vector, w: number = 1, h: number = 1): Room | undefined {
+    let foundNeighbor = false;
+
+    for (let x = 0; x < w; x++) {
+      const upKey = encodeKey(new Vector(position.x + x, position.y - 1));
+      const downKey = encodeKey(new Vector(position.x + x, position.y + h));
+      if (this.map.has(upKey) || this.map.has(downKey)) {
+        foundNeighbor = true;
+        break;
+      }
+    }
+    if (!foundNeighbor) {
+      for (let y = 0; y < h; y++) {
+        const leftKey = encodeKey(new Vector(position.x - 1, position.y + y));
+        const rightKey = encodeKey(new Vector(position.x + w, position.y + y));
+        if (this.map.has(leftKey) || this.map.has(rightKey)) {
+          foundNeighbor = true;
+          break;
+        }
+      }
+    }
+
+    if (!foundNeighbor) {
+      return;
+    }
+
+    return this.createRoomWithoutCheckingNeighbors(position, w, h);
+  }
+
+  private createRoomWithoutCheckingNeighbors(
+    position: Vector,
+    w: number = 1,
+    h: number = 1,
+  ): Room {
     const keys = [];
     for (let x = 0; x < w; x++) {
       for (let y = 0; y < h; y++) {
@@ -90,7 +125,13 @@ export class RoomWeb {
     if (nextRoom) {
       this.currentRoom = nextRoom;
     } else {
-      this.currentRoom = this.createRoom(toKey);
+      const newRoom = this.createRoom(toKey, 1, 1);
+
+      if (!newRoom) {
+        console.error("Failed creating new room!", toKey);
+      }
+
+      this.currentRoom = newRoom!;
     }
 
     this.currentRoom.enterFrom(event);

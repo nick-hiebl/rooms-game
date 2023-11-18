@@ -306,17 +306,25 @@ export class Octagon {
       console.error("Collision fuck up");
     }
 
-    if (yDiff < this.radius - this.cornerCut + rectangle.height / 2) {
-      // Face collision - horizontal
-      const xDist = rectangle.width / 2 + this.radius;
-      this.center.x = rectMid.x + xDist * sign(this.center.x - rectMid.x);
-      return;
-    }
+    const xDist = rectangle.width / 2 + this.radius;
+    const nextX = rectMid.x + xDist * sign(this.center.x - rectMid.x);
+    const xShove = Math.abs(this.center.x - nextX);
 
-    if (xDiff < this.radius - this.cornerCut + rectangle.width / 2) {
-      // Face collision - vertical
-      const yDist = rectangle.height / 2 + this.radius;
-      this.center.y = rectMid.y + yDist * sign(this.center.y - rectMid.y);
+    const yDist = rectangle.height / 2 + this.radius;
+    const nextY = rectMid.y + yDist * sign(this.center.y - rectMid.y);
+    const yShove = Math.abs(this.center.y - nextY);
+
+    if (
+      // Hitting vertical face (sides, not corner)
+      yDiff < this.radius - this.cornerCut + rectangle.height / 2 ||
+      // Hitting horizontal face (top/bottom, not corner)
+      xDiff < this.radius - this.cornerCut + rectangle.width / 2
+    ) {
+      if (xShove < yShove) {
+        this.center.x = nextX;
+      } else {
+        this.center.y = nextY;
+      }
       return;
     }
 

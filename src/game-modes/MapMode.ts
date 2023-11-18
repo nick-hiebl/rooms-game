@@ -179,7 +179,7 @@ export class MapMode {
 
       const newRoom = this.playMode.roomWeb.createRoom(room, 2, 2);
 
-      if (!this.roomCanvasMap.get(newRoom.key)) {
+      if (newRoom && !this.roomCanvasMap.get(newRoom.key)) {
         this.predrawRooms();
       }
       // const hoveredIcon = this.drawIcons.find((icon) => icon.isHovered);
