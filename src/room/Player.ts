@@ -7,7 +7,7 @@ import { Octagon } from "../math/Shapes";
 import { Vector } from "../math/Vector";
 import { Room } from "./Room";
 
-const PLAYER_MAX_SPEED = 130;
+const PLAYER_MAX_SPEED = 500 //130;
 const PLAYER_ACCEL = PLAYER_MAX_SPEED / 1.2;
 
 export class Player {

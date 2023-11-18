@@ -1,3 +1,5 @@
+import { Vector } from "../math/Vector";
+
 export interface GameEvent {
   isExitEvent(): boolean;
   isOpenMapEvent(): boolean;
@@ -6,11 +8,13 @@ export interface GameEvent {
 export type Direction = 'up' | 'left' | 'down' | 'right';
 
 export class ExitEvent implements GameEvent {
-  roomKey: string;
+  fromKey: Vector;
+  toKey: Vector;
   direction: Direction;
 
-  constructor(roomKey: string, direction: Direction) {
-    this.roomKey = roomKey;
+  constructor(fromKey: Vector, toKey: Vector, direction: Direction) {
+    this.fromKey = fromKey;
+    this.toKey = toKey;
     this.direction = direction;
   }
 

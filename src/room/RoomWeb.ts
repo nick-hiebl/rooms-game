@@ -64,15 +64,14 @@ export class RoomWeb {
   }
 
   navigate(event: ExitEvent) {
-    const { roomKey, direction } = event;
+    const { fromKey, direction, toKey } = event;
 
-    const nextPosition = Vector.add(parseKey(roomKey), directionMap[direction]);
-    const nextKey = encodeKey(nextPosition)
+    const nextKey = encodeKey(toKey)
 
-    const currentRoom = this.map.get(roomKey);
+    const currentRoom = this.map.get(encodeKey(fromKey));
 
     if (!currentRoom) {
-      console.error("Exited a room that does not exist!", roomKey, Array.from(this.map.keys()));
+      console.error("Exited a room that does not exist!", fromKey, Array.from(this.map.keys()));
       return;
     }
 
@@ -80,7 +79,7 @@ export class RoomWeb {
     if (nextRoom) {
       this.currentRoom = nextRoom;
     } else {
-      this.currentRoom = this.createRoom(nextPosition);
+      this.currentRoom = this.createRoom(toKey);
     }
 
     this.currentRoom.enterFrom(event);
