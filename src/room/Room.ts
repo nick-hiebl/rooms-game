@@ -1,13 +1,14 @@
 import { Canvas } from "../Canvas";
-import { GRID_SIZE } from "../constants/WorldConstants";
+import { GRID_SIZE, WORLD_GRID_HEIGHT, WORLD_GRID_WIDTH } from "../constants/WorldConstants";
 import { Direction, ExitEvent } from "../game-modes/GameEvent";
 import { PlayMode } from "../game-modes/PlayMode";
 import { InputEvent, InputState } from "../InputManager";
-import { floorTo } from "../math/Common";
+import { clamp, floorTo } from "../math/Common";
 import { Rectangle } from "../math/Shapes";
 import { Vector } from "../math/Vector";
 import { ScreenManager } from "../ScreenManager";
 import { Player } from "./Player";
+import { encodeKey, parseKey } from "./RoomWeb";
 
 const DOORWAY_SIZE = GRID_SIZE * 2;
 
@@ -21,6 +22,8 @@ export class Room {
   height: number;
   collider: Rectangle;
 
+  position: Vector;
+
   player: Player;
   camera: Vector;
 
@@ -32,12 +35,14 @@ export class Room {
 
   color: string;
 
-  constructor(key: string, width: number, height: number) {
+  constructor(position: Vector, width: number, height: number) {
     this.color = `hsl(${randint(360)}, ${randint(20) + 50}%, ${randint(30) + 60}%)`;
 
-    this.key = key;
+    this.key = encodeKey(position);
     this.width = floorTo(width, 2 * GRID_SIZE);
     this.height = floorTo(height, 2 * GRID_SIZE);
+
+    this.position = position;
 
     this.collider = Rectangle.widthForm(0, 0, this.width, this.height);
 
@@ -86,6 +91,10 @@ export class Room {
     if (exit) {
       mode.onLevelEvent(new ExitEvent(this.key, exit[1]));
     }
+
+    this.camera = this.player.collider.center.copy();
+    this.camera.x = clamp(this.camera.x, WORLD_GRID_WIDTH / 2, this.width - WORLD_GRID_WIDTH / 2);
+    this.camera.y = clamp(this.camera.y, WORLD_GRID_HEIGHT / 2, this.height - WORLD_GRID_HEIGHT / 2);
   }
 
   onInput(input: InputEvent) {

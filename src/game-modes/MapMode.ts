@@ -7,11 +7,11 @@ import {
   ScrollEvent,
 } from "../InputManager";
 import { Room } from "../room/Room";
-import { clamp } from "../math/Common";
+import { clamp, floorTo } from "../math/Common";
 import { Vector } from "../math/Vector";
 import { ScreenManager } from "../ScreenManager";
 import { PlayMode } from "./PlayMode";
-import { parseKey } from "../room/RoomWeb";
+import { parseKey, RoomWeb } from "../room/RoomWeb";
 import { GRID_SIZE, WORLD_GRID_HEIGHT, WORLD_GRID_WIDTH } from "../constants/WorldConstants";
 
 const DEBUG_SHOW_ALL_ROOMS = document.location.toString().includes("localhost");
@@ -43,6 +43,7 @@ export class MapMode {
 
   mousePosition: Vector;
   isClicked: boolean;
+  hoverPosition: Vector;
 
   canvasW: number;
   canvasH: number;
@@ -59,6 +60,7 @@ export class MapMode {
 
     this.mousePosition = new Vector(0, 0);
     this.isClicked = false;
+    this.hoverPosition = new Vector(0, 0);
 
     this.canvasW = 0;
     this.canvasH = 0;
@@ -79,6 +81,8 @@ export class MapMode {
     this.setCameraPos();
     this.mousePosition = new Vector(0, 0);
     this.isClicked = false;
+    this.hoverPosition = new Vector(0, 0);
+
     this.predrawRooms();
     this.drawIcons = this.getIconsToShow();
   }
@@ -109,14 +113,14 @@ export class MapMode {
 
       const canvas = this.roomCanvasMap.get(room.key) ||
         Canvas.fromScratch(
-          room.width * MAX_ZOOM / GRID_SIZE * MAP_CANVAS_SCALE,
-          room.height * MAX_ZOOM / GRID_SIZE * MAP_CANVAS_SCALE,
+          room.width * 1 / GRID_SIZE * MAP_CANVAS_SCALE,
+          room.height * 1 / GRID_SIZE * MAP_CANVAS_SCALE,
         );
 
-      canvas.saveTransform();
-      canvas.scale(MAX_ZOOM, MAX_ZOOM);
+      // canvas.saveTransform();
+      // canvas.scale(, );
       room.drawForMap(canvas);
-      canvas.restoreTransform();
+      // canvas.restoreTransform();
 
       this.roomCanvasMap.set(room.key, canvas);
     }
@@ -124,16 +128,15 @@ export class MapMode {
 
   toWorldPosition(position: Vector) {
     return Vector.add(
-      Vector.scale(
-        Vector.diff(position, new Vector(this.canvasW / 2, this.canvasH / 2)),
-        1 / this.zoom
-      ),
+      Vector.scale(position, 1 / this.zoom),
       this.cameraPosition
     );
   }
 
   update(_deltaTime: number, inputState: InputState) {
     const currentWorldPos = this.toWorldPosition(inputState.mousePosition);
+
+    this.hoverPosition = this.toWorldPosition(inputState.mousePosition);
 
     let found: MapInteractible | undefined = undefined;
     for (const icon of this.drawIcons) {
@@ -163,6 +166,15 @@ export class MapMode {
   onInput(inputEvent: InputEvent) {
     // Do nothing
     if (inputEvent.isClick()) {
+      const mousePosition = this.toWorldPosition((inputEvent as ClickEvent).position);
+
+      const room = this.positionToRoomIndex(mousePosition);
+
+      const newRoom = this.playMode.roomWeb.createRoom(room, 2, 2);
+
+      if (!this.roomCanvasMap.get(newRoom.key)) {
+        this.predrawRooms();
+      }
       // const hoveredIcon = this.drawIcons.find((icon) => icon.isHovered);
 
       // const isAPortalActive = this.playMode.currentLevel.interactingWith instanceof PortalInteractible;
@@ -196,9 +208,18 @@ export class MapMode {
   }
 
   getRoomPosition(room: Room) {
-    const { x, y } = parseKey(room.key);
+    const { x, y } = room.position;
 
     return new Vector(x * WORLD_GRID_WIDTH, y * WORLD_GRID_HEIGHT);
+  }
+
+  positionToRoomIndex(position: Vector) {
+    const hoveredRoomPosition = new Vector(
+      floorTo(position.x, WORLD_GRID_WIDTH),
+      floorTo(position.y, WORLD_GRID_HEIGHT),
+    );
+
+    return new Vector(hoveredRoomPosition.x / WORLD_GRID_WIDTH, hoveredRoomPosition.y / WORLD_GRID_HEIGHT);
   }
 
   draw(screenManager: ScreenManager) {
@@ -228,6 +249,11 @@ export class MapMode {
 
       const position = this.getRoomPosition(room);
 
+      // const hoverPositionInRoom = Vector.diff(this.hoverPosition, position);
+
+      // const isHovered = hoverPositionInRoom.x >= 0 && hoverPositionInRoom.x < room.width &&
+      //   hoverPositionInRoom.y >= 0 && hoverPositionInRoom.y < room.height;
+
       canvas.drawImage(
         roomCanvas,
         0,
@@ -236,10 +262,19 @@ export class MapMode {
         roomCanvas.height,
         position.x,
         position.y,
-        room.width * 2,
-        room.height * 2,
+        room.width,
+        room.height,
       );
     }
+
+    const hoveredRoom = new Vector(
+      floorTo(this.hoverPosition.x, WORLD_GRID_WIDTH),
+      floorTo(this.hoverPosition.y, WORLD_GRID_HEIGHT),
+    );
+
+    canvas.setColor("#fff6");
+    canvas.setLineWidth(4);
+    canvas.strokeRect(hoveredRoom.x, hoveredRoom.y, WORLD_GRID_WIDTH, WORLD_GRID_HEIGHT);
 
     if (currentPlayer) {
       const worldPosition = this.getRoomPosition(currentRoom);
@@ -256,6 +291,9 @@ export class MapMode {
 
       canvas.translate(-offset.x, -offset.y);
     }
+
+    canvas.setColor("pink");
+    canvas.fillEllipse(this.hoverPosition.x, this.hoverPosition.y, 5, 5);
 
     // const zoom = this.zoom / 2;
 
