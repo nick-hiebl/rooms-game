@@ -3,6 +3,7 @@ import {
   WORLD_GRID_WIDTH,
 } from "../constants/WorldConstants";
 import { Direction, ExitEvent } from "../game-modes/GameEvent";
+import { shuffle } from "../math/Common";
 import { Vector } from "../math/Vector";
 import { Room } from "./Room";
 
@@ -14,6 +15,35 @@ export const parseKey = (s: string): Vector => {
 
 export const encodeKey = (v: Vector): string => {
   return `${v.x},${v.y}`;
+};
+
+const makeNewRoomOptions = (direction: Direction): [Vector, number, number][] => {
+  const options: [Vector, number, number][] = [
+    [new Vector(-2, 0), 3, 1],
+    [new Vector(-1, 0), 3, 1],
+    [new Vector(0, 0), 3, 1],
+    [new Vector(0, -2), 1, 3],
+    [new Vector(0, -1), 1, 3],
+    [new Vector(0, 0), 1, 3],
+    [new Vector(0, 0), 1, 1],
+  ];
+
+  switch (direction) {
+    case 'up':
+      options.push([new Vector(-1, -1), 2, 2], [new Vector(0, -1), 2, 2]);
+      break;
+    case 'left':
+      options.push([new Vector(-1, -1), 2, 2], [new Vector(-1, 0), 2, 2]);
+      break;
+    case 'down':
+      options.push([new Vector(-1, 0), 2, 2], [new Vector(0, 0), 2, 2]);
+      break;
+    case 'right':
+      options.push([new Vector(0, -1), 2, 2], [new Vector(0, 0), 2, 2]);
+      break;
+  }
+
+  return shuffle(options);
 };
 
 const directionMap: Record<Direction, Vector> = {
@@ -37,6 +67,10 @@ export class RoomWeb {
     this.currentRoom = this.createRoomWithoutCheckingNeighbors(
       new Vector(0, 0),
     );
+  }
+
+  getRoom(position: Vector) {
+    return this.map.get(encodeKey(position));
   }
 
   createRoom(position: Vector, w: number = 1, h: number = 1): Room | undefined {
@@ -65,6 +99,17 @@ export class RoomWeb {
       return;
     }
 
+    for (let x = 0; x < w; x++) {
+      for (let y = 0; y < h; y++) {
+        const key = encodeKey(new Vector(position.x + x, position.y + y));
+
+        const existingRoom = this.map.get(key);
+        if (existingRoom) {
+          return;
+        }
+      }
+    }
+
     return this.createRoomWithoutCheckingNeighbors(position, w, h);
   }
 
@@ -81,7 +126,8 @@ export class RoomWeb {
 
         const existingRoom = this.map.get(key);
         if (existingRoom) {
-          return existingRoom;
+          console.error("Asked to create an overlapping room!");
+          throw Error();
         }
       }
     }
@@ -106,7 +152,7 @@ export class RoomWeb {
   }
 
   navigate(event: ExitEvent) {
-    const { fromKey, direction, toKey } = event;
+    const { direction, fromKey, toKey } = event;
 
     const nextKey = encodeKey(toKey);
 
@@ -125,7 +171,18 @@ export class RoomWeb {
     if (nextRoom) {
       this.currentRoom = nextRoom;
     } else {
-      const newRoom = this.createRoom(toKey, 1, 1);
+      let newRoom: Room | undefined;
+
+      for (const [offset, w, h] of makeNewRoomOptions(direction)) {
+        newRoom = this.createRoom(Vector.add(toKey, offset), w, h);
+
+        if (newRoom) break;
+      }
+
+      if (!newRoom) {
+        // This should succeed no matter what.
+        newRoom = this.createRoom(toKey, 1, 1);
+      }
 
       if (!newRoom) {
         console.error("Failed creating new room!", toKey);

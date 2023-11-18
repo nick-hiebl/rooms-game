@@ -171,16 +171,23 @@ export class MapMode {
   onInput(inputEvent: InputEvent) {
     // Do nothing
     if (inputEvent.isClick()) {
-      const mousePosition = this.toWorldPosition(
-        (inputEvent as ClickEvent).position,
-      );
+      const event = inputEvent as ClickEvent;
 
-      const room = this.positionToRoomIndex(mousePosition);
+      if (!event.isRightClick()) {
+        this.mousePosition = this.toWorldPosition(event.position);
+        this.isClicked = true;
 
-      const newRoom = this.playMode.roomWeb.createRoom(room, 2, 2);
+        const mousePosition = this.toWorldPosition(event.position);
 
-      if (newRoom && !this.roomCanvasMap.get(newRoom.key)) {
-        this.predrawRooms();
+        const room = this.positionToRoomIndex(mousePosition);
+
+        if (!this.playMode.roomWeb.getRoom(room)) {
+          const newRoom = this.playMode.roomWeb.createRoom(room, 2, 2);
+
+          if (newRoom && !this.roomCanvasMap.get(newRoom.key)) {
+            this.predrawRooms();
+          }
+        }
       }
       // const hoveredIcon = this.drawIcons.find((icon) => icon.isHovered);
 
@@ -194,12 +201,6 @@ export class MapMode {
       //     this.gameModeManager.switchToMode(this.playMode);
       //   }
       // }
-
-      const event = inputEvent as ClickEvent;
-      if (!event.isRightClick()) {
-        this.mousePosition = this.toWorldPosition(event.position);
-        this.isClicked = true;
-      }
     } else if (inputEvent.isScroll()) {
       const scroll = inputEvent as ScrollEvent;
       if (scroll.discrete) {

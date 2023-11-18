@@ -7,7 +7,7 @@ import {
 import { ExitEvent } from "../game-modes/GameEvent";
 import { PlayMode } from "../game-modes/PlayMode";
 import { InputEvent, InputState } from "../InputManager";
-import { clamp, floorTo } from "../math/Common";
+import { clamp, floorTo, randint } from "../math/Common";
 import { Rectangle } from "../math/Shapes";
 import { Vector } from "../math/Vector";
 import { ScreenManager } from "../ScreenManager";
@@ -17,8 +17,6 @@ import { encodeKey } from "./RoomWeb";
 const DOORWAY_SIZE = GRID_SIZE * 2;
 
 const BOUNDARY = 50;
-
-const randint = (max: number) => Math.floor(Math.random() * max);
 
 export class Room {
   key: string;

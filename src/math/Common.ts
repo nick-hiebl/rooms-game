@@ -21,3 +21,15 @@ export const sign = (x: number): number => {
 export const floorTo = (x: number, fidelity: number): number => {
   return fidelity * Math.floor(x / fidelity);
 };
+
+export const randint = (max: number) => Math.floor(Math.random() * max);
+
+export function shuffle<T>(array: T[]) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const swapTo = randint(i + 1);
+
+    [array[i], array[swapTo]] = [array[swapTo], array[i]];
+  }
+
+  return array;
+}
