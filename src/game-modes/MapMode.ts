@@ -208,7 +208,7 @@ export class MapMode {
     this.canvasW = canvas.width;
     this.canvasH = canvas.height;
 
-    canvas.setColor("#223366");
+    canvas.setColor("black");
     canvas.fillRect(0, 0, canvas.width, canvas.height);
 
     canvas.saveTransform();
